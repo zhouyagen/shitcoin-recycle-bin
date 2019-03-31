@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>shit coin</title>
+    <link rel="stylesheet" href="http://i.gtimg.cn/vipstyle/frozenui/2.0.0/css/frozen.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="./js/jquery-uuid.js"></script>
+    <script src="./js/base.js"></script>
+    <script src="./js/shitcoin.js" ></script>
+</head>
+<body>
+    <ul id = "shitCoinList" class="ui-list ui-list-function ui-border-tb">
+    </ul>
+    <div id="donedialog" class="ui-dialog">
+        <div class="ui-dialog-cnt">
+            <div class="ui-dialog-bd">
+                <p>已经清理完成?</p>
+            </div>
+            <div class="ui-dialog-ft">
+                <button type="button" data-role="button" onclick="closeDialog()">no</button>
+                <button type="button" data-role="button" onclick="updateShitcoinList()">yes</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
