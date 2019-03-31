@@ -24,6 +24,7 @@ $.when( $.ready ).then(function() {
         "code": code,
         "client_secret": client_sercret
       }
+      loading();
       $.ajax({
         url: "https://api.mixin.one/oauth/token",
         type: "POST",
@@ -45,13 +46,14 @@ $.when( $.ready ).then(function() {
 
 
   function clean(url){
-      $("#donedialog").addClass("show");
+      showDoneDialog();
       window.open(url);
   }
 
   function updateShitcoinList() {
       var authtoken = "Bearer " + getCacheAccessToken();
-      $("#donedialog").removeClass("show");
+      closeDialog();//关闭询问弹窗
+      loading();//加载loading
       $.ajax({
           url: "https://api.mixin.one/assets",
           dataType: "json",
@@ -59,6 +61,7 @@ $.when( $.ready ).then(function() {
               "Authorization": authtoken
           },
           success: function (data) {
+              loaded();//关闭loading
               var dataObj = data["data"];
               var shitcoins = [];
               if (!!dataObj) {
@@ -100,9 +103,20 @@ $.when( $.ready ).then(function() {
     $("#shitCoinList").html(html);
  }
 
+ function showDoneDialog() {
+    $("#donedialog").addClass("show");
+ }
 
  function closeDialog() {
     $("#donedialog").removeClass("show");
+ }
+
+ function loading(){
+     $("#loading").addClass("show");
+ }
+
+ function loaded(){
+    $("#loading").removeClass("show");
  }
 
  function requestPayment(assetId,amount) {
