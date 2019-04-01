@@ -14,7 +14,12 @@ $.when( $.ready ).then(function() {
         }
     }else{
         console.log("cache access_token");
-        updateShitcoinList();
+        var shitCoins = getCacheAssets();
+        if(!!shitCoins){
+            showshitCoins(shitCoins);//展示
+        }else{
+            updateShitcoinList();
+        }
     }
   });
 
@@ -45,9 +50,57 @@ $.when( $.ready ).then(function() {
   }
 
 
-  function clean(url){
+  function clean(assetId,amount){
+    $("#" + assetId +" .ui-btn").addClass("disabled");
       showDoneDialog();
+      trace_id = $.uuid();
+      asset_id = assetId;
+      var url = "https://mixin.one/pay?recipient="+ client_id +"&asset="+ assetId +"&trace="+ trace_id  +"&amount="+ amount +"&memo="+ encodeURI("clean shit coin");
       window.open(url);
+  }
+
+  function checkPayment() {
+    if(!!trace_id){
+        //置灰
+        $("#" + asset_id +" .ui-btn").addClass("disabled");
+
+        var authtoken = "Bearer " + getCacheAccessToken();
+        var url = "https://api.mixin.one/transfers/trace/" + trace_id;
+        $.ajax({
+            url: url,
+            dataType: "json",
+            headers: {
+                "Authorization": authtoken
+            },
+            success: function (data) {
+                var dataObj = data["data"];
+                if (!!dataObj) {
+                    var payedAssetId = dataObj["asset_id"];
+                    //成功，更新列表
+                    $("#" + payedAssetId).remove();
+                    //更新缓存
+                    
+                }else if(!!data["error"]){
+                    //没有支付，不清除列表
+                    $("#" + asset_id +" .ui-btn").removeClass("disabled");
+                }
+                closeDialog();
+            }
+        });
+    }
+  }
+
+  function updateCache(assetId) {
+      var shitCoins = getCacheAssets();
+      var index = shitCoins.length;
+      while (index-- ) {
+          var shitCoin = shitCoins[index];
+          if(!!shitCoin && shitCoin["asset_id"] == assetId){
+              shitCoins.splice(index,1)
+          }
+      }
+      cacheAssets(shitCoins);
+      
   }
 
   function updateShitcoinList() {
@@ -63,32 +116,32 @@ $.when( $.ready ).then(function() {
           success: function (data) {
               loaded();//关闭loading
               var dataObj = data["data"];
-              var shitcoins = [];
+              var shitCoins = [];
               if (!!dataObj) {
                   for (index in dataObj) {
                       var asset = dataObj[index];
                       if (asset["price_btc"] == '0' && asset["price_usd"] == '0') {
-                          asset["cleanUrl"] = requestPayment(asset["asset_id"], asset["balance"]);
-                          shitcoins.push(asset);
+                          shitCoins.push(asset);
                       }
                   }
               }else if(!!data["error"]){
                   //过期，重新授权
                   auth();
               }
-              showShitcoins(shitcoins);
+              cacheAssets(shitCoins);//缓存
+              showshitCoins(shitCoins);//展示
           }
       });
  }
 
- function showShitcoins(shitcoins) {
+ function showshitCoins(shitCoins) {
     var html = '';
-    if (shitcoins.length == 0) {
+    if (shitCoins.length == 0) {
         html = "你的钱包很干净";
     } else {
-        for (index in shitcoins) {
-            var shitCoin = shitcoins[index];
-            html += '<li>' +
+        for (index in shitCoins) {
+            var shitCoin = shitCoins[index];
+            html += '<li id="' + shitCoin["asset_id"] + '">' +
                 '<div class="ui-avatar">' +
                 '<span style="background-image:url(' + shitCoin['icon_url'] + '"></span>' +
                 '</div>' +
@@ -96,11 +149,15 @@ $.when( $.ready ).then(function() {
                 '<h4 class="ui-nowrap">' + shitCoin['symbol'] + '</h4>' +
                 '<p>' + shitCoin['balance'] + '</p>' +
                 '</div>' +
-                '<div class="ui-btn" onclick = "clean(\'' + shitCoin["cleanUrl"] + '\')">clean</div>' +
+                '<div class="ui-btn" onclick = "clean(\'' + shitCoin["asset_id"] + '\',\''+ shitCoin["balance"] + '\')">clean</div>' +
                 '</li>';
         }
     }
     $("#shitCoinList").html(html);
+ }
+
+ function cleaned(traceId){
+
  }
 
  function showDoneDialog() {
@@ -117,8 +174,4 @@ $.when( $.ready ).then(function() {
 
  function loaded(){
     $("#loading").removeClass("show");
- }
-
- function requestPayment(assetId,amount) {
-    return "https://mixin.one/pay?recipient="+ client_id +"&asset="+ assetId +"&amount="+ amount +"&trace="+ $.uuid() +"&memo="+ encodeURI("clean shit coin");
  }
