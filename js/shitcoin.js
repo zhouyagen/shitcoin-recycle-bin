@@ -61,32 +61,10 @@ $.when( $.ready ).then(function() {
 
   function checkPayment() {
     if(!!trace_id){
-        //置灰
-        $("#" + asset_id +" .ui-btn").addClass("disabled");
-
-        var authtoken = "Bearer " + getCacheAccessToken();
-        var url = "https://api.mixin.one/transfers/trace/" + trace_id;
-        $.ajax({
-            url: url,
-            dataType: "json",
-            headers: {
-                "Authorization": authtoken
-            },
-            success: function (data) {
-                var dataObj = data["data"];
-                if (!!dataObj) {
-                    var payedAssetId = dataObj["asset_id"];
-                    //成功，更新列表
-                    $("#" + payedAssetId).remove();
-                    //更新缓存
-                    
-                }else if(!!data["error"]){
-                    //没有支付，不清除列表
-                    $("#" + asset_id +" .ui-btn").removeClass("disabled");
-                }
-                closeDialog();
-            }
-        });
+        //隐藏
+        $("#" + asset_id).hide();
+        updateCache(asset_id);
+        closeDialog();
     }
   }
 
