@@ -1,61 +1,61 @@
-$.when( $.ready ).then(function() {
-    $.support.cors = true;
-    console.log("ready");
-    var access_token = getCacheAccessToken();
-    console.log(access_token);
-    
-    if(!access_token){
-        console.log("no cache");
-        var code = getUrlParameter("code");
-        var error = getUrlParameter("error");
-        console.log(code + ":" + error);
-        if(!!code){
-            getAccessToken(code);
-        }
-    }else{
-        console.log("cache access_token");
-        var shitCoins = getCacheAssets();
-        if(!!shitCoins){
-            showshitCoins(shitCoins);//展示
-        }else{
-            updateShitcoinList();
-        }
-    }
-  });
+ $.when($.ready).then(function () {
+     $.support.cors = true;
+     console.log("ready");
+     var access_token = getCacheAccessToken();
+     console.log(access_token);
+
+     if (!access_token) {
+         console.log("no cache");
+         var code = getUrlParameter("code");
+         var error = getUrlParameter("error");
+         console.log(code + ":" + error);
+         if (!!code) {
+             getAccessToken(code);
+         }
+     } else {
+         console.log("cache access_token");
+         var shitCoins = getCacheAssets();
+         if (!!shitCoins) {
+             showshitCoins(shitCoins); //展示
+         } else {
+             updateShitcoinList();
+         }
+     }
+ });
 
   function getAccessToken(code) {
       var data = {
-        "client_id": client_id,
-        "code": code,
-        "client_secret": client_sercret
+          "client_id": client_id,
+          "code": code,
+          "client_secret": client_sercret
       }
       loading();
       $.ajax({
-        url: "https://api.mixin.one/oauth/token",
-        type: "POST",
-        dataType: "json",
-        crossDomain: true,
-        contentType:"application/json",
-        data:JSON.stringify(data),
-        success: function (data) {
-            var dataObj = data["data"];
-            if(!!dataObj){
-              access_token = dataObj["access_token"];
-              console.log(access_token);
-            }
-            cacheAccessToken(access_token);
-            updateShitcoinList();
-        }
-    });
+          url: "https://api.mixin.one/oauth/token",
+          type: "POST",
+          dataType: "json",
+          crossDomain: true,
+          contentType: "application/json",
+          data: JSON.stringify(data),
+          success: function (data) {
+              var dataObj = data["data"];
+              if (!!dataObj) {
+                  access_token = dataObj["access_token"];
+                  console.log(access_token);
+              }
+              cacheAccessToken(access_token);
+              updateShitcoinList();
+          }
+      });
   }
 
 
-  function clean(assetId,amount){
-    $("#" + assetId +" .ui-btn").addClass("disabled");
+  function clean(assetId, amount) {
+      $("#" + assetId + " .ui-btn").addClass("disabled");
       showDoneDialog();
       trace_id = $.uuid();
       asset_id = assetId;
-      var url = "https://mixin.one/pay?recipient="+ client_id +"&asset="+ assetId +"&trace="+ trace_id  +"&amount="+ amount +"&memo="+ encodeURI("clean shit coin");
+      var url = "https://mixin.one/pay?recipient=" + client_id + "&asset=" + assetId + "&trace=" + trace_id + "&amount=" + amount + "&memo=" + encodeURI("clean shit coin");
       window.open(url);
   }
 
@@ -83,8 +83,8 @@ $.when( $.ready ).then(function() {
 
   function updateShitcoinList() {
       var authtoken = "Bearer " + getCacheAccessToken();
-      closeDialog();//关闭询问弹窗
-      loading();//加载loading
+      closeDialog(); //关闭询问弹窗
+      loading(); //加载loading
       $.ajax({
           url: "https://api.mixin.one/assets",
           dataType: "json",
@@ -92,7 +92,7 @@ $.when( $.ready ).then(function() {
               "Authorization": authtoken
           },
           success: function (data) {
-              loaded();//关闭loading
+              loaded(); //关闭loading
               var dataObj = data["data"];
               var shitCoins = [];
               if (!!dataObj) {
@@ -102,15 +102,15 @@ $.when( $.ready ).then(function() {
                           shitCoins.push(asset);
                       }
                   }
-              }else if(!!data["error"]){
+              } else if (!!data["error"]) {
                   //过期，重新授权
                   auth();
               }
-              cacheAssets(shitCoins);//缓存
-              showshitCoins(shitCoins);//展示
+              cacheAssets(shitCoins); //缓存
+              showshitCoins(shitCoins); //展示
           }
       });
- }
+  }
 
  function showshitCoins(shitCoins) {
     var html = '';
@@ -134,9 +134,6 @@ $.when( $.ready ).then(function() {
     $("#shitCoinList").html(html);
  }
 
- function cleaned(traceId){
-
- }
 
  function showDoneDialog() {
     $("#donedialog").addClass("show");
