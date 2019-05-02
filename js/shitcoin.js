@@ -3,10 +3,9 @@
      console.log("ready");
      var access_token = getCacheAccessToken();
      console.log(access_token);
-
-     if (!access_token) {
-         console.log("no cache");
-         var code = getUrlParameter("code");
+     var code = getUrlParameter("code");
+     if (!access_token  || !!code) {
+         console.log("no cache");         
          var error = getUrlParameter("error");
          console.log(code + ":" + error);
          if (!!code) {
