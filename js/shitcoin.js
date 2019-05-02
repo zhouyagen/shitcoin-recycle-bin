@@ -103,6 +103,7 @@
                   }
               } else if (!!data["error"]) {
                   //过期，重新授权
+                  removeAccessToken();
                   auth();
               }
               cacheAssets(shitCoins); //缓存

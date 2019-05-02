@@ -29,6 +29,13 @@ function cacheAccessToken(accessToken) {
 }
 
 /**
+ * 删除过期的accesstoke
+ */
+function removeAccessToken() {
+    window.localStorage.removeItem(access_token_key);
+}
+
+/**
  * 获取缓存的access_token
  */
 function getCacheAccessToken() {
